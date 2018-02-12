@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import tensorflow as tf
+from utils.gaussian_kernel import gaussian_kernel
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
@@ -34,36 +35,37 @@ class VGG16mo:
 
         self.conv1_1 = self.conv_layer(bgr, "conv1_1")
         self.conv1_2 = self.conv_layer(self.conv1_1, "conv1_2")
-        self.pool1, self.idx1 = self.max_pool(self.conv1_2, 'pool1')
+        self.pool1 = self.max_pool(self.conv1_2, 'pool1')
 
         self.conv2_1 = self.conv_layer(self.pool1, "conv2_1")
         self.conv2_2 = self.conv_layer(self.conv2_1, "conv2_2")
-        self.pool2, self.idx2 = self.max_pool(self.conv2_2, 'pool2')
+        self.pool2 = self.max_pool(self.conv2_2, 'pool2')
 
         self.conv3_1 = self.conv_layer(self.pool2, "conv3_1")
         self.conv3_2 = self.conv_layer(self.conv3_1, "conv3_2")
         self.conv3_3 = self.conv_layer(self.conv3_2, "conv3_3")
-        self.pool3, self.idx3 = self.max_pool(self.conv3_3, 'pool3')
+        self.kconv3 = self.kconv_layer(self.conv3_3, "kconv3")
+        self.pool3 = self.max_pool(self.conv3_3, 'pool3')
 
         self.conv4_1 = self.conv_layer(self.pool3, "conv4_1")
         self.conv4_2 = self.conv_layer(self.conv4_1, "conv4_2")
         self.conv4_3 = self.conv_layer(self.conv4_2, "conv4_3")
-        self.pool4, self.idx4 = self.max_pool(self.conv4_3, 'pool4')
+        self.kconv4 = self.kconv_layer(self.conv4_3, "kconv4")
+        self.pool4 = self.max_pool(self.conv4_3, 'pool4')
 
         self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
         self.conv5_2 = self.conv_layer(self.conv5_1, "conv5_2")
         self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
-        self.pool5, self.idx5 = self.max_pool(self.conv5_3, 'pool5')
+        self.pool5 = self.max_pool(self.conv5_3, 'pool5')
 
         self.data_dict = None
 
     def max_pool(self, bottom, name):
-        return tf.nn.max_pool_with_argmax(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
 
     def conv_layer(self, bottom, name):
         with tf.variable_scope(name):
             filt = self.get_conv_filter(name)
-            print(filt)
 
             conv = tf.nn.conv2d(bottom, filt, [1, 1, 1, 1], padding='SAME')
 
@@ -71,6 +73,18 @@ class VGG16mo:
             bias = tf.nn.bias_add(conv, conv_biases)
 
             relu = tf.nn.relu(bias)
+            return relu
+
+    def kconv_layer(self, bottom, name):
+        with tf.variable_scope(name):
+            b, h, w, c = bottom.shape
+            s = int(h/14)
+            kern2d = gaussian_kernel(s)
+            filt = np.zeros([s, s, c, c])
+            for i in range(c): filt[:, :, i, i] = kern2d
+            filt = tf.constant(filt, name="filter", dtype='float32')
+            conv = tf.nn.conv2d(bottom, filt, [1, s, s, 1], padding='SAME')
+            relu = tf.nn.relu(conv)
             return relu
 
     def get_conv_filter(self, name):

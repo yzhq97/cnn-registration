@@ -30,20 +30,18 @@ with tf.Session() as sess:
     feed_dict = {images: input}
     vgg = VGG16mo()
     vgg.build(images)
-    pool1, idx1, pool2, idx2, pool3, idx3,\
-    pool4, idx4, pool5, idx5 = sess.run([
-        vgg.pool1, vgg.idx1, vgg.pool2, vgg.idx2,
-        vgg.pool3, vgg.idx3, vgg.pool4, vgg.idx4,
-        vgg.pool5, vgg.idx5
+    conv3, conv4, conv5 = sess.run([
+        vgg.kconv3, vgg.kconv4, vgg.conv5_3
     ], feed_dict=feed_dict)
 
-Xpool1 = pool1[0]
-iX1 = np.unravel_index(idx1[0], [2, 224, 224, 64])[1:]
-Xmap1 = np.zeros([224, 224, 64])
-Xmap1[iX1[0], iX1[1], iX1[2]] = Xpool1
+seq = np.array([[i, j] for i in range(14) for j in range(14)], dtype='int32')
+X = np.array(seq, dtype='float32') * 32 + 16
+Y = np.array(seq, dtype='float32') * 32 + 16
+N = X.shape[0]
 
-Xpool2 = pool2[0]
-iX2 = np.unravel_index(idx2[0], [2, 112, 112, 128])[1:]
-Xmap2_1 = np.zeros([112, 112, 128])
-Xmap2_1[iX2[0], iX2[1], iX2[2]] = Xpool2
-Xmap2 = np.zeros([224, 224, 128])
+DX3 = conv3[0, seq[:, 0], seq[:, 1]]
+DY3 = conv3[1, seq[:, 0], seq[:, 1]]
+DX4 = conv4[0, seq[:, 0], seq[:, 1]]
+DY4 = conv4[1, seq[:, 0], seq[:, 1]]
+DX5 = conv5[0, seq[:, 0], seq[:, 1]]
+DY5 = conv5[1, seq[:, 0], seq[:, 1]]
