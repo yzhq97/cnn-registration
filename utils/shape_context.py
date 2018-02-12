@@ -102,7 +102,6 @@ class ShapeContext(object):
 
         
     def compute(self,points,r=None):
-        t = time.time()
         r_array = self._dist2(points,points)
         mean_dist = r_array.mean()
         r_array_n = r_array / mean_dist
@@ -132,10 +131,8 @@ class ShapeContext(object):
             sn = zeros((self.nbins_r, self.nbins_theta))
             for j in xrange(len(points)):
                 if (fz[i, j]):
-                    sn[r_array_q[i, j] - 1, theta_array_q[i, j] - 1] += 1
+                    sn[int(r_array_q[i, j] - 1), int(theta_array_q[i, j] - 1)] += 1
             BH[i] = sn.reshape(self.nbins)
-            
-        print 'PROFILE TOTAL COST: ' + str(time.time()-t)     
             
         return BH        
         
