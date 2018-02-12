@@ -3,13 +3,14 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-
 from VGG16mo import VGG16mo
+from utils.shape_context import ShapeContext
 
 height = 224
 width = 224
 
-datadir = '../data/RemoteSense/ANGLE/68/'
+# datadir = '../data/RemoteSense/ANGLE/68/'
+datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/ANGLE/68/'
 IX_name = '2.jpg'
 IY_name = '7.jpg'
 
@@ -45,3 +46,6 @@ DX4 = conv4[0, seq[:, 0], seq[:, 1]]
 DY4 = conv4[1, seq[:, 0], seq[:, 1]]
 DX5 = conv5[0, seq[:, 0], seq[:, 1]]
 DY5 = conv5[1, seq[:, 0], seq[:, 1]]
+
+SC = ShapeContext()
+SCX = SC.compute(X)

@@ -1,13 +1,9 @@
 from numpy import *
 from scipy.interpolate import Rbf,InterpolatedUnivariateSpline,interp1d
 import math
-# Hungurian algorithm implementation
 import munkres
-from utils import get_points_from_img,get_elements,bookenstain
 import time
 import heapq
-import cv
-import sys
 
 seterr(all='ignore')
 
@@ -23,13 +19,56 @@ def euclid_distance(p1,p2):
 def get_angle(p1,p2):
     """Return angle in radians"""
     return math.atan2((p2[1] - p1[1]),(p2[0] - p1[0]))
+
+
+def bookenstain(X, Y, beta):
+    """
+        Bookstein PAMI89
+        Article: Principal Warps: Thin-Plate Splines and the Decomposition of Deformations
+    """
+    X = asmatrix(X)
+    Y = asmatrix(Y)
+
+    N = X.shape[0]
+    r2 = dist2(X, X)
+    K = multiply(r2, log(r2 + eye(N, N)))
+    P = concatenate((ones((N, 1)), X), 1)
+    L = bmat([[K, P], [P.H, zeros((3, 3))]])
+    V = concatenate((Y.H, zeros((2, 3))), 1)
+
+    L[0:N, 0:N] = L[0:N, 0:N] + beta * eye(N, N)
+
+    invL = linalg.inv(L)
+
+    # L^-1 * v^T = (W | a_1 a_x a_y)^T
+    c = invL * (V.H)
+    cx = c[:, 0]
+    cy = c[:, 1]
+
+    Q = (c[0:N, :].H) * K * c[0:N, :]
+    E = mean(diag(Q))
+
+    n_good = 10
+
+    A = concatenate((cx[n_good + 2:n_good + 3, :], cy[n_good + 2:n_good + 3, :]), 1);
+    s = linalg.svd(A);
+    aff_cost = log(s[0] / s[1])
+
+    return cx, cy, E, aff_cost, L
+
+def dist2(x,c):
+    """
+        Euclidian distance matrix
+    """
+    ncentres = c.shape[0]
+    ndata = x.shape[0]
+    return (ones((ncentres, 1)) * (((power(x,2)).H)).sum(axis=0)).H + ones((ndata, 1)) * ((power(c,2)).H).sum(axis=0) - multiply(2,(x*(c.H)));
     
-    
-class SC(object):
+class ShapeContext(object):
 
     HUNGURIAN = 1
 
-    def __init__(self,nbins_r=5,nbins_theta=12,r_inner=0.1250,r_outer=2.0):
+    def __init__(self, nbins_r=5, nbins_theta=12, r_inner=0.1250, r_outer=2.0):
         self.nbins_r        = nbins_r
         self.nbins_theta    = nbins_theta
         self.r_inner        = r_inner
