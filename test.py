@@ -6,6 +6,7 @@ from PIL import Image
 from VGG16mo import VGG16mo
 from utils.shape_context import ShapeContext
 from utils.utils import *
+import matplotlib.pyplot as plt
 
 height = 224
 width = 224
@@ -13,7 +14,7 @@ width = 224
 datadir = '../data/RemoteSense/ANGLE/68/'
 # datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/ANGLE/68/'
 IX_name = '2.jpg'
-IY_name = '7.jpg'
+IY_name = '13.jpg'
 
 IX_image = Image.open(datadir+IX_name)
 IY_image = Image.open(datadir+IY_name)
@@ -47,18 +48,12 @@ D = np.concatenate([D1, D2, D3, D4], axis=3)
 DX = D[0, seq[:, 0], seq[:, 1]]
 DY = D[1, seq[:, 0], seq[:, 1]]
 
-T = Y.copy()
-GRB = gaussian_radial_basis(Y)
-sigma2 = init_sigma2(X, Y)
-Q = 0
-iter = 1
+C, q = match(DX, DY)
+x = np.arange(1.0, 1.4, 0.001)
+y = np.zeros_like(x)
+for i in range(x.shape[0]):
+    y[i] = np.where(q>=x[i])[0].shape[0]
 
-
-
-
-
-
-
-
-
+plt.plot(x, y)
+plt.show()
 

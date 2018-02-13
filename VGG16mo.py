@@ -44,14 +44,17 @@ class VGG16mo:
         self.conv3_1 = self.conv_layer(self.pool2, "conv3_1")
         self.conv3_2 = self.conv_layer(self.conv3_1, "conv3_2")
         self.conv3_3 = self.conv_layer(self.conv3_2, "conv3_3")
-        self.kconv3 = self.kconv_layer(self.conv3_3, "kconv3")
         self.pool3 = self.max_pool(self.conv3_3, 'pool3')
+
+        self.kconv3_1 = self.kconv_layer(self.conv3_1, "kconv3")
+        self.kconv3_3 = self.kconv_layer(self.conv3_3, "kconv3")
 
         self.conv4_1 = self.conv_layer(self.pool3, "conv4_1")
         self.conv4_2 = self.conv_layer(self.conv4_1, "conv4_2")
         self.conv4_3 = self.conv_layer(self.conv4_2, "conv4_3")
-        self.kconv4 = self.kconv_layer(self.conv4_3, "kconv4")
         self.pool4 = self.max_pool(self.conv4_3, 'pool4')
+
+        self.kconv4_3 = self.kconv_layer(self.conv4_3, "kconv4")
 
         self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
         self.conv5_2 = self.conv_layer(self.conv5_1, "conv5_2")

@@ -30,7 +30,7 @@ def init_sigma2(X, Y):
     t3 = 2.0 * np.dot(np.sum(X, axis=1), np.transpose(np.sum(Y, axis=1)))
     return (t1 + t2 -t3)/(M*N*2.0)
 
-def match(DX, DY, threshold):
+def match(DX, DY):
     PD = pairwise_distance(DX, DY)
     seq = np.arange(PD.shape[1])
     amin1 = np.argmin(PD, axis=0)
@@ -40,5 +40,4 @@ def match(DX, DY, threshold):
     mask[amin1, seq] = 1
     masked = np.ma.masked_array(PD, mask)
     min2 = np.amin(masked, axis=0)
-    keep = np.where(min2/min1 >= threshold)
-    return C[keep, :]
+    return (C, min2/min1)
