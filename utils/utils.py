@@ -40,7 +40,7 @@ def match(PD):
     mask[amin1, seq] = 1
     masked = np.ma.masked_array(PD, mask)
     min2 = np.amin(masked, axis=0)
-    return (C, min2/min1)
+    return C, min2/min1
 
 def compute(X, Y, T_old, Pm, sigma2, omega):
     N = X.shape[0]
@@ -67,4 +67,30 @@ def compute(X, Y, T_old, Pm, sigma2, omega):
     t3 = np.trace(np.dot(np.dot(T.transpose(), Py), T))
     tmp =  t1 - 2.0*t2 + t3
     Q = Np * log(sigma2) + tmp/(2.0*sigma2)
-    return (Po, P1, Np, tmp, Q)
+    return Po, P1, Np, tmp, Q
+
+def convert_feature(X, XS0, DXS0):
+    DXS = np.ones([14 * 14, 128]) * np.mean(DXS0)
+    Xmap = [[] for _ in range(14 * 14)]
+    for i in range(len(XS0)):
+        Xmap[int(XS0[i, 0] / 32.0) * 14 + int(XS0[i, 1] / 32.0)].append(i)
+
+    # # method 1
+    # for i in range(14 * 14):
+    #     mindis = float('Inf')
+    #     minind = -1
+    #     for j in range(len(Xmap[i])):
+    #         dis = np.linalg.norm(XS0[Xmap[i][j], :] - X[i, :])
+    #         if dis < mindis:
+    #             mindis = dis
+    #             minind = j
+    #     if minind != -1:
+    #         X[i, :] = XS0[Xmap[i][j], :]
+    #         DXS[i, :] = DXS0[Xmap[i][j], :]
+
+    # method 2
+    for i in range(14 * 14):
+        if len(Xmap[i]) > 0:
+            DXS[i, :] = np.mean(DXS0[Xmap[i], :], axis=0)
+
+    return X, DXS
