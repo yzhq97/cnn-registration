@@ -27,14 +27,24 @@ datadir = '../data/Objects/'
 IX_name = 'car3.jpeg'
 IY_name = 'car4.jpeg'
 
-IX_image = Image.open(datadir+IX_name)
-IY_image = Image.open(datadir+IY_name)
+# SIFT
 
-IX_image = IX_image.resize((width, height))
-IY_image = IY_image.resize((width, height))
+IX = cv2.resize(cv2.imread(datadir+IX_name), (width, height))
+IY = cv2.resize(cv2.imread(datadir+IY_name), (width, height))
+IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
+IY_gray = cv2.cvtColor(IY, cv2.COLOR_BGR2GRAY)
 
-IX = np.asarray(IX_image, dtype='float32')
-IY = np.asarray(IY_image, dtype='float32')
+SIFT = cv2.xfeatures2d.SIFT_create()
+XS, DXS = SIFT.detectAndCompute(IX, None)
+YS, DYS = SIFT.detectAndCompute(IY, None)
+XS = np.array([kp.pt for kp in XS])
+YS = np.array([kp.pt for kp in YS])
+
+DXS = (DXS - np.mean(DXS))/np.std(DXS)
+DYS = (DYS - np.mean(DYS))/np.std(DYS)
+
+# CNN feature
+
 IX = np.expand_dims(IX, axis=0)
 IY = np.expand_dims(IY, axis=0)
 
@@ -58,9 +68,13 @@ assert M==N
 X = X / 224.0
 Y = Y / 224.0
 
-D = np.concatenate([D3, D4], axis=3)
-DX = D[0, seq[:, 0], seq[:, 1]]
-DY = D[1, seq[:, 0], seq[:, 1]]
+# D = np.concatenate([D3, D4], axis=3)
+# DX = D[0, seq[:, 0], seq[:, 1]]
+# DY = D[1, seq[:, 0], seq[:, 1]]
+
+#  generate combined feature
+
+
 PD = pairwise_distance(DX, DY)
 C_all, quality = match(PD)
 while np.where(quality>=tau_0)[0].shape[0] < 5: tau_0 -= 0.01
