@@ -169,8 +169,8 @@ class SIFT(object):
         tolerance = self.tolerance = 1e-2
         freq = self.freq = 5
         delta = self.delta = 0.05
-        epsilon = self.epsilon = 0.7
-        omega = self.omega = 0.7
+        epsilon = self.epsilon = 0.5
+        omega = self.omega = 0.5
         beta = self.beta = 2.0
         lambd = self.lambd = 3.0
 
@@ -195,10 +195,13 @@ class SIFT(object):
         PD = pairwise_distance(DXS, DYS)
         C_all, quality = match(PD)
         C = C_all[np.where(quality >= 1.25)]
-        shape = np.array(IY_gray.shape[:2], dtype='float32')
-        center = shape / 2.0
-        X = (XS[C[:, 1], :] - center) / shape
-        Y = (YS[C[:, 0], :] - center) / shape
+        X, Y = XS[C[:, 1], :], YS[C[:, 0], :]
+
+        shape_arr = np.array(IY_gray.shape[:2], dtype='float32')
+        center = 0.5 * shape_arr
+
+        X = (X-center) / shape_arr
+        Y = (Y-center) / shape_arr
         DX = DXS[C[:, 1], :]
         DY = DYS[C[:, 0], :]
 
