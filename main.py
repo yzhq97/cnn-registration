@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 from utils.thin_plate_spline import ThinPlateSpline2
 
 
-datadir = '../data/Objects/'
-#datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/ANGLE/68/'
-IX_path = datadir + 'car3.jpeg'
-IY_path = datadir + 'car4.jpeg'
+#datadir = '../data/Objects/'
+datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/ANGLE/baoshan/'
+IX_path = datadir + '1.jpg'
+IY_path = datadir + '1.jpg'
 
 IX = cv2.imread(IX_path)
 IY = cv2.imread(IY_path)
@@ -24,8 +24,8 @@ Y, T = reg.register(IX, IY)
 im = plt.imread(IY_path)
 #plt.gca().invert_yaxis()
 plt.imshow(im)
-plt.scatter(Y[:, 0], Y[:, 1])
-plt.scatter(T[:, 0], T[:, 1])
+plt.scatter(Y[:, 1], Y[:, 0])
+plt.scatter(T[:, 1], T[:, 0])
 plt.show()
 
 print('generating warped image')
@@ -37,7 +37,7 @@ Y = tf.constant(np.expand_dims(Y, axis=0), dtype=np.float32)
 T = tf.constant(np.expand_dims(T, axis=0), dtype=np.float32)
 
 img = tf.constant(np.expand_dims(IY, axis=0), dtype=np.float32)
-img = ThinPlateSpline2(img, T, Y, (shape_arr+500).tolist())
+img = ThinPlateSpline2(img, Y, T, shape_arr.tolist())
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     img1 = sess.run(img)

@@ -58,11 +58,6 @@ class CNN(object):
                 self.VGG.kconv3_1, self.VGG.kconv3_3, self.VGG.kconv4_3, self.VGG.conv5_1
             ], feed_dict=feed_dict)
 
-        D1 = (D1 - np.mean(D1)) / np.std(D1)
-        D2 = (D2 - np.mean(D2)) / np.std(D2)
-        D3 = (D3 - np.mean(D3)) / np.std(D3)
-        D4 = (D4 - np.mean(D4)) / np.std(D4)
-
         D = np.concatenate([D4], axis=3)
 
         # generate combined feature
@@ -89,8 +84,8 @@ class CNN(object):
         GRB = gaussian_radial_basis(Y, beta)
         A = np.zeros([M, 2])
         sigma2 = init_sigma2(X, Y)
-        tau = 2.0
-        while np.where(quality >= tau)[0].shape[0] < 50: tau -= 0.01
+        tau = 10.0
+        while np.where(quality >= tau)[0].shape[0] < 40: tau -= 0.01
         print('initial tau: %f' % tau)
 
         Pm = None
@@ -109,6 +104,7 @@ class CNN(object):
                 C = C_all[np.where(quality >= tau)]
                 L = np.zeros([M, N])
                 L[C[:, 0], C[:, 1]] = PD[C[:, 0], C[:, 1]]
+                print(np.max(L))
                 L = L / np.max(L)
                 L[np.where(L == 0.0)] = 1.0
 
@@ -172,7 +168,7 @@ class SIFT(object):
         epsilon = self.epsilon = 0.5
         omega = self.omega = 0.5
         beta = self.beta = 2.0
-        lambd = self.lambd = 3.0
+        lambd = self.lambd = 0.5
 
         # SIFT
         IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
@@ -182,14 +178,16 @@ class SIFT(object):
         YS0, DYS0 = self.SIFT.detectAndCompute(IY_gray, None)
         XS, YS, DXS, DYS = [], [], [], []
         for i in range(len(XS0)):
-            if XS0[i].response > 0.04:
+            if XS0[i].response > 0.03:
                 XS.append(XS0[i].pt)
                 DXS.append(DXS0[i])
         for i in range(len(YS0)):
-            if YS0[i].response > 0.04:
+            if YS0[i].response > 0.03:
                 YS.append(YS0[i].pt)
                 DYS.append(DYS0[i])
         XS, YS, DXS, DYS = np.array(XS), np.array(YS), np.array(DXS), np.array(DYS)
+        XS = np.array([XS[:, 1], XS[:, 0]]).transpose()
+        YS = np.array([YS[:, 1], YS[:, 0]]).transpose()
 
         # select points
         PD = pairwise_distance(DXS, DYS)
@@ -218,7 +216,7 @@ class SIFT(object):
         GRB = gaussian_radial_basis(Y, beta)
         A = np.zeros([M, 2])
         sigma2 = init_sigma2(X, Y)
-        tau = 2.5
+        tau = 2.0
         while tau > 1.25 and np.where(quality >= tau)[0].shape[0] < 20: tau -= 0.01
         print('initial tau = %.2f' % tau)
 
@@ -275,7 +273,7 @@ class SIFT(object):
             # print(itr, Q, tau)
 
         print('finish: itr %d, Q %d, tau %d' % (itr, Q, tau))
-        return Y * shape + center, T * shape + center
+        return Y * shape_arr + center, T * shape_arr + center
 
 
 class Combined(object):
