@@ -7,15 +7,17 @@ from utils.utils import *
 import cv2
 from lap import lapjv
 import matplotlib.pyplot as plt
-from utils.tf_ThinPlateSpline.ThinPlateSpline import ThinPlateSpline
 
 class CNN(object):
     def __init__(self):
         self.height = 224
         self.width = 224
+        self.shape = np.array([224, 224])
 
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
+
+        self.max_itr = 50
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -31,7 +33,7 @@ class CNN(object):
         self.VGG = VGG16mo()
         self.VGG.build(self.cnnph)
 
-    def register(self, path1, path2):
+    def register(self, IX, IY):
 
         # set parameters
         tolerance = self.tolerance = 1e-2
@@ -42,27 +44,15 @@ class CNN(object):
         beta = self.beta = 2.0
         lambd = self.lambd = 0.5
 
-        # SIFT
-        IX = cv2.resize(cv2.imread(path1), (self.width, self.height))
-        IY = cv2.imread(path2)
-        IY_shape = IY.shape
+        # resize image
+        IX = cv2.resize(IX, (self.width, self.height))
+        scale = 1.0 * np.array(IY.shape[:2]) / self.shape
         IY = cv2.resize(IY, (self.width, self.height))
-        IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
-        IY_gray = cv2.cvtColor(IY, cv2.COLOR_BGR2GRAY)
-
-        XS, DXS = self.SIFT.detectAndCompute(IX_gray, None)
-        YS, DYS = self.SIFT.detectAndCompute(IY_gray, None)
-        XS = np.array([kp.pt for kp in XS])
-        YS = np.array([kp.pt for kp in YS])
-
-        DXS = (DXS - np.mean(DXS)) / np.std(DXS)
-        DYS = (DYS - np.mean(DYS)) / np.std(DYS)
 
         # CNN feature
 
         IX = np.expand_dims(IX, axis=0)
         IY = np.expand_dims(IY, axis=0)
-
         cnn_input = np.concatenate((IX, IY), axis=0)
         with tf.Session() as sess:
             feed_dict = {self.cnnph: cnn_input}
@@ -83,8 +73,8 @@ class CNN(object):
         DX = D[0, seq[:, 0], seq[:, 1]]
         DY = D[1, seq[:, 0], seq[:, 1]]
 
-        X = np.array(seq, dtype='float32') * 32 + 16
-        Y = np.array(seq, dtype='float32') * 32 + 16
+        X = np.array(seq, dtype='float32') * 16 + 8
+        Y = np.array(seq, dtype='float32') * 16 + 8
         N = X.shape[0]
         M = X.shape[0]
         assert M == N
@@ -111,7 +101,7 @@ class CNN(object):
         itr = 1
 
         # registration process
-        while itr <= 100 and abs(dQ) > tolerance and sigma2 > 1e-4:
+        while itr < self.max_itr and abs(dQ) > tolerance and sigma2 > 1e-4:
             T_old = T.copy()
             Q_old = Q
 
@@ -156,12 +146,16 @@ class CNN(object):
 
             print(itr, Q, tau)
 
+        return Y * scale * 224.0, T * scale * 224.0
 
 
 class SIFT(object):
     def __init__(self):
         self.height = 224
         self.width = 224
+        self.shape = np.array([224, 224])
+
+        self.max_itr = 50
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -173,7 +167,7 @@ class SIFT(object):
 
         self.SIFT = cv2.xfeatures2d.SIFT_create()
 
-    def register(self, path1, path2):
+    def register(self, IX, IY):
 
         # set parameters
         tolerance = self.tolerance = 1e-2
@@ -185,8 +179,9 @@ class SIFT(object):
         lambd = self.lambd = 0.5
 
         # SIFT
-        IX = cv2.resize(cv2.imread(path1), (self.width, self.height))
-        IY = cv2.resize(cv2.imread(path2), (self.width, self.height))
+        IX = cv2.resize(IX, (self.width, self.height))
+        scale = 1.0 * np.array(IY.shape[:2]) / self.shape
+        IY = cv2.resize(IY, (self.width, self.height))
         IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
         IY_gray = cv2.cvtColor(IY, cv2.COLOR_BGR2GRAY)
 
@@ -198,7 +193,7 @@ class SIFT(object):
         # select points
         PD = pairwise_distance(DXS, DYS)
         C_all, quality = match(PD)
-        C = C_all[np.where(quality >= 1.25)]
+        C = C_all[np.where(quality >= 1.5)]
         X = XS[C[:, 0], :]
         Y = YS[C[:, 1], :]
         DX = DXS[C[:, 0], :]
@@ -231,7 +226,7 @@ class SIFT(object):
         itr = 1
 
         # registration process
-        while itr <= 100 and abs(dQ) > tolerance and sigma2 > 1e-4:
+        while itr < self.max_itr and abs(dQ) > tolerance and sigma2 > 1e-4:
             T_old = T.copy()
             Q_old = Q
 
@@ -276,15 +271,18 @@ class SIFT(object):
 
             print(itr, Q, tau)
 
-        return X, Y, T
+        return Y * scale * 224.0, T * scale * 224.0
 
 class Combined(object):
     def __init__(self):
         self.height = 224
         self.width = 224
+        self.shape = np.array([224, 224])
 
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
+
+        self.max_itr = 50
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -300,7 +298,7 @@ class Combined(object):
         self.VGG = VGG16mo()
         self.VGG.build(self.cnnph)
 
-    def register(self, path1, path2):
+    def register(self, IX, IY):
 
         # set parameters
         tolerance = self.tolerance = 1e-2
@@ -312,8 +310,9 @@ class Combined(object):
         lambd = self.lambd = 0.5
 
         # SIFT
-        IX = cv2.resize(cv2.imread(path1), (self.width, self.height))
-        IY = cv2.resize(cv2.imread(path2), (self.width, self.height))
+        IX = cv2.resize(IX, (self.width, self.height))
+        scale = 1.0 * np.array(IY.shape[:2]) / self.shape
+        IY = cv2.resize(IY, (self.width, self.height))
         IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
         IY_gray = cv2.cvtColor(IY, cv2.COLOR_BGR2GRAY)
 
@@ -345,8 +344,8 @@ class Combined(object):
         DX4 = D4[0, seq[:, 0], seq[:, 1]]
         DY4 = D4[1, seq[:, 0], seq[:, 1]]
 
-        X = np.array(seq, dtype='float32') * 32 + 16
-        Y = np.array(seq, dtype='float32') * 32 + 16
+        X = np.array(seq, dtype='float32') * 16 + 8
+        Y = np.array(seq, dtype='float32') * 16 + 8
         N = X.shape[0]
         M = X.shape[0]
         assert M == N
@@ -379,7 +378,7 @@ class Combined(object):
         itr = 1
 
         # registration process
-        while itr <= 100 and abs(dQ) > tolerance and sigma2 > 1e-4:
+        while itr < self.max_itr and abs(dQ) > tolerance and sigma2 > 1e-4:
             T_old = T.copy()
             Q_old = Q
 
@@ -424,4 +423,4 @@ class Combined(object):
 
             print(itr, Q, tau)
 
-        return X, Y, T
+        return Y * scale * 224.0, T * scale * 224.0
