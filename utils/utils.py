@@ -28,32 +28,29 @@ def init_sigma2(X, Y):
     M = float(Y.shape[0])
     t1 = M * np.trace(np.dot(np.transpose(X), X))
     t2 = N * np.trace(np.dot(np.transpose(Y), Y))
-    t3 = 2.0 * np.dot(np.sum(X, axis=1), np.transpose(np.sum(Y, axis=1)))
+    t3 = 2.0 * np.dot(np.sum(X, axis=0), np.transpose(np.sum(Y, axis=0)))
     return (t1 + t2 -t3)/(M*N*2.0)
 
 def match(PD):
-    seq = np.arange(PD.shape[1])
-    amin1 = np.argmin(PD, axis=0)
+    seq = np.arange(PD.shape[0])
+    amin1 = np.argmin(PD, axis=1)
     C = np.array([seq, amin1]).transpose()
-    min1 = PD[amin1, seq]
+    min1 = PD[seq, amin1]
     mask = np.zeros_like(PD)
-    mask[amin1, seq] = 1
+    mask[seq, amin1] = 1
     masked = np.ma.masked_array(PD, mask)
-    min2 = np.amin(masked, axis=0)
-    return C, min2/min1
+    min2 = np.amin(masked, axis=1)
+    return C, np.array(min2/min1)
 
 def compute(X, Y, T_old, Pm, sigma2, omega):
     N = X.shape[0]
     M = Y.shape[0]
     T = T_old
 
-    Pmxn = np.zeros([M, N])
-    for m in range(M):
-        for n in range(N):
-            xn = X[n, :]
-            tm = T[m, :]
-            Pmxn[m, n] = (1-omega) * Pm[m, n] * \
-                         exp( -(1/(2*sigma2)) * np.power(xn-tm, 2).sum() )
+    Te = np.repeat(np.expand_dims(T, axis=1), N, axis=1)
+    Xe = np.repeat(np.expand_dims(T, axis=0), M, axis=0)
+    Pmxn = (1-omega) * Pm * np.exp(
+        -(1 / (2 * sigma2)) * np.sum(np.power(Xe-Te, 2), axis=2) )
 
     Pxn = np.sum(Pmxn, axis=0) + omega/N
     Po = Pmxn / np.repeat(np.expand_dims(Pxn, axis=0), M, axis=0)
