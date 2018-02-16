@@ -1,23 +1,17 @@
 from __future__ import print_function
 
+import numpy as np
 import cv2
 import CNNR
 import matplotlib.pyplot as plt
 
-datadir = '../data/RemoteSense/ANGLE/68/'
+datadir = '../data/Objects/'
 #datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/ANGLE/68/'
-IX_path = datadir + '2.jpg'
-IY_path = datadir + '7.jpg'
+IX_path = datadir + 'car3.jpeg'
+IY_path = datadir + 'car4.jpeg'
 
 reg = CNNR.CNN()
-
-X, Y, T = reg.register(IX_path, IY_path)
-plt.gca().invert_yaxis()
-plt.scatter(X[:, 0], X[:, 1])
-#plt.scatter(Y[:, 0], Y[:, 1])
-plt.scatter(T[:, 0], T[:, 1])
-plt.show()
-
+reg.register(IX_path, IY_path)
 
 
     

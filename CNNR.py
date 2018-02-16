@@ -7,6 +7,7 @@ from utils.utils import *
 import cv2
 from lap import lapjv
 import matplotlib.pyplot as plt
+from utils.tf_ThinPlateSpline.ThinPlateSpline import ThinPlateSpline
 
 class CNN(object):
     def __init__(self):
@@ -43,7 +44,9 @@ class CNN(object):
 
         # SIFT
         IX = cv2.resize(cv2.imread(path1), (self.width, self.height))
-        IY = cv2.resize(cv2.imread(path2), (self.width, self.height))
+        IY = cv2.imread(path2)
+        IY_shape = IY.shape
+        IY = cv2.resize(IY, (self.width, self.height))
         IX_gray = cv2.cvtColor(IX, cv2.COLOR_BGR2GRAY)
         IY_gray = cv2.cvtColor(IY, cv2.COLOR_BGR2GRAY)
 
@@ -153,7 +156,7 @@ class CNN(object):
 
             print(itr, Q, tau)
 
-        return X, Y, T
+
 
 class SIFT(object):
     def __init__(self):
