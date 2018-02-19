@@ -1,5 +1,6 @@
 import numpy as np
 from math import exp, log
+from scipy.interpolate import Rbf
 
 def gaussian_kernel(size, sigma=1.2):
     seq = np.array([[i, j] for i in range(size) for j in range(size)], dtype='int32')
@@ -91,3 +92,51 @@ def convert_feature(X, XS0, DXS0):
             DXS[i, :] = np.mean(DXS0[Xmap[i], :], axis=0)
 
     return X, DXS
+
+def tps_warp(Y, T, Y_image, out_shape):
+    Y_height, Y_width = Y_image.shape[:2]
+    T_height, T_width = out_shape[:2]
+
+    i_func = Rbf(T[:, 0], T[:, 1], Y[:, 0], function='thin-plate')
+    j_func = Rbf(T[:, 0], T[:, 1], Y[:, 1], function='thin-plate')
+
+    iT, jT = np.mgrid[:T_height, :T_width]
+    iT = iT.flatten()
+    jT = jT.flatten()
+    iY = np.int_(i_func(iT, jT))
+    jY = np.int_(j_func(iT, jT))
+
+    keep = np.logical_and(iY>=0, jY>=0)
+    keep = np.logical_and(keep, iY<Y_height)
+    keep = np.logical_and(keep, jY<Y_width)
+    iY, jY, iT, jT = iY[keep], jY[keep], iT[keep], jT[keep]
+
+    out_image = np.zeros(out_shape, dtype='uint8')
+    out_image[iT, jT, :] = Y_image[iY, jY, :]
+
+    return out_image
+
+def checkboard(I1, I2, n=7):
+    assert I1.shape == I2.shape
+    height, width, channels = I1.shape
+    hi, wi = height/n, width/n
+    outshape = (hi*n, wi*n, channels)
+
+    out_image = np.zeros(outshape, dtype='uint8')
+    for i in range(n):
+        h = hi * i
+        h1 = h + hi
+        for j in range(n):
+            w = wi * j
+            w1 = w + wi
+            if (i-j)%2 == 0:
+                out_image[h:h1, w:w1, :] = I1[h:h1, w:w1, :]
+            else:
+                out_image[h:h1, w:w1, :] = I2[h:h1, w:w1, :]
+
+    return out_image
+
+
+
+
+

@@ -15,10 +15,10 @@ class VGG16mo:
             path = os.path.abspath(os.path.join(path, os.pardir))
             path = os.path.join(path, "vgg16.npy")
             vgg16_npy_path = path
-            print(path)
+            #print(path)
 
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
-        print("npy file loaded")
+        #print("npy file loaded")
 
     def build(self, rgb):
         # Convert RGB to BGR
@@ -45,26 +45,27 @@ class VGG16mo:
         self.conv3_2 = self.conv_layer(self.conv3_1, "conv3_2")
         self.conv3_3 = self.conv_layer(self.conv3_2, "conv3_3")
         self.pool3 = self.max_pool(self.conv3_3, 'pool3')
-
-        self.kconv3_1 = self.kconv_layer(self.conv3_1, "kconv3")
-        self.kconv3_3 = self.kconv_layer(self.conv3_3, "kconv3")
+        self.pool3_1_s4 = self.max_pool_s4(self.conv3_1, 'pool3_1_s4')
+        self.pool3_s4 = self.max_pool_s4(self.conv3_3, 'pool3_s4')
 
         self.conv4_1 = self.conv_layer(self.pool3, "conv4_1")
         self.conv4_2 = self.conv_layer(self.conv4_1, "conv4_2")
         self.conv4_3 = self.conv_layer(self.conv4_2, "conv4_3")
         self.pool4 = self.max_pool(self.conv4_3, 'pool4')
 
-        self.kconv4_3 = self.kconv_layer(self.conv4_3, "kconv4")
-
         self.conv5_1 = self.conv_layer(self.pool4, "conv5_1")
         self.conv5_2 = self.conv_layer(self.conv5_1, "conv5_2")
         self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
         self.pool5 = self.max_pool(self.conv5_3, 'pool5')
+        self.pool5_1 = self.max_pool(self.conv5_1, 'pool5')
 
         self.data_dict = None
 
     def max_pool(self, bottom, name):
         return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+
+    def max_pool_s4(self, bottom, name):
+        return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 4, 4, 1], padding='SAME', name=name)
 
     def conv_layer(self, bottom, name):
         with tf.variable_scope(name):
