@@ -20,9 +20,8 @@ class VGG16mo:
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         #print("npy file loaded")
 
-    def build(self, rgb):
-        # Convert RGB to BGR
-        red, green, blue = tf.split(axis=3, num_or_size_splits=3, value=rgb)
+    def build(self, bgr):
+        blue, green, red = tf.split(axis=3, num_or_size_splits=3, value=bgr)
         assert red.get_shape().as_list()[1:] == [224, 224, 1]
         assert green.get_shape().as_list()[1:] == [224, 224, 1]
         assert blue.get_shape().as_list()[1:] == [224, 224, 1]

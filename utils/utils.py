@@ -15,10 +15,16 @@ def pairwise_distance(X, Y):
     assert len(X.shape) == len(Y.shape)
     N = X.shape[0]
     M = Y.shape[0]
-    D = len(X.shape)
-    Xe = np.repeat(np.expand_dims(X, axis=0), M, axis=0)
-    Ye = np.repeat(np.expand_dims(Y, axis=1), N, axis=1)
-    return np.linalg.norm(Xe-Ye, axis=D)
+    # D = len(X.shape)
+    res = np.zeros([M, N])
+    for i in range(M):
+        for j in range(N):
+            res[i][j] = np.linalg.norm(X[j] - Y[i])
+    return res
+    # return np.linalg.norm(
+    #     np.repeat(np.expand_dims(X, axis=0), M, axis=0) -
+    #     np.repeat(np.expand_dims(Y, axis=1), N, axis=1),
+    #     axis=D)
 
 def gaussian_radial_basis(X, beta=2.0):
     PD = pairwise_distance(X, X)

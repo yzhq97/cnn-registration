@@ -5,15 +5,16 @@ import tensorflow as tf
 import REG
 import matplotlib.pyplot as plt
 from utils.utils import *
+import cv2
 
-#datadir = '../data/Objects/'
-datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/TEST/'
+datadir = '../../data/RemoteSense/TEST/'
+#datadir = '/Users/yzhq/Code/MATLAB/data/RemoteSense/TEST/'
 #datadir = '/Users/yzhq/Code/data/Objects/'
-IX_path = datadir + 'r1.JPG'
-IY_path = datadir + 'r2.JPG'
+IX_path = datadir + '4a.jpg'
+IY_path = datadir + '4c.jpg'
 
-IX = plt.imread(IX_path)
-IY = plt.imread(IY_path)
+IX = cv2.imread(IX_path)
+IY = cv2.imread(IY_path)
 shape_arr = np.array(IX.shape[:2])
 center = shape_arr / 2.0
 
@@ -26,17 +27,22 @@ for i in range(6):
     X, Y, T = reg.register(IX, IY)
     print("total %s seconds" % (time.time() - start_time))
 
-    start_time = time.time()
-    registered = tps_warp(Y, T, IY, IX.shape)
-    cb = checkboard(IX, registered)
-    print("warp and checkboard cost %s seconds" % (time.time() - start_time))
-
-    #plt.gca().invert_yaxis()
-    plt.subplot(231 + i)
-    plt.title(name)
-    plt.imshow(cb)
-    plt.scatter(X[:, 1], X[:, 0], s=20, marker='o')
-    plt.scatter(T[:, 1], T[:, 0], s=20, marker='x', linewidths=0.5)
+    try:
+        start_time = time.time()
+        registered = tps_warp(Y, T, IY, IX.shape)
+        cb = checkboard(IX, registered)
+        print("warp and checkboard cost %s seconds" % (time.time() - start_time))
+        plt.subplot(231 + i)
+        plt.title(name)
+        plt.imshow(cv2.cvtColor(cb, cv2.COLOR_BGR2RGB))
+        plt.scatter(X[:, 1], X[:, 0], s=10, marker='o')
+        plt.scatter(T[:, 1], T[:, 0], s=10, marker='x', linewidths=0.1)
+    except:
+        plt.subplot(231 + i)
+        plt.title(name+'(TPS failed)')
+        plt.imshow(cv2.cvtColor(IX, cv2.COLOR_BGR2RGB))
+        plt.scatter(X[:, 1], X[:, 0], s=10, marker='o')
+        plt.scatter(T[:, 1], T[:, 0], s=10, marker='x', linewidths=0.1)
 
     print()
 
