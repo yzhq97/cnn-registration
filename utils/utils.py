@@ -142,7 +142,14 @@ def checkboard(I1, I2, n=7):
 
     return out_image
 
-
+def pd_expand(PD, k):
+    N0 = np.int(np.sqrt(PD.shape[0]))
+    N1 = k*N0
+    L0, L1 = N0**2, N1**2
+    Cmat = np.kron(np.arange(L0).reshape([N0, N0]), np.ones([k, k], dtype='int32'))
+    i = np.repeat(Cmat.reshape([L1, 1]), L1, axis=1)
+    j = np.repeat(Cmat.reshape([1, L1]), L1, axis=0)
+    return PD[i, j]
 
 
 

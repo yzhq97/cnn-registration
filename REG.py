@@ -20,7 +20,7 @@ class CNN(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -81,9 +81,11 @@ class CNN(object):
         # prematch and select points
         PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
+        print('mean quality: %f' % np.mean(quality))
 
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 48: tau_max -= 0.001
+        print(tau_max)
+        while np.where(quality >= tau_max)[0].shape[0] <= 65: tau_max -= 0.001
 
         C = C_all[np.where(quality >= tau_max)]
         X, Y = X[C[:, 1]], Y[C[:, 0]]
@@ -100,7 +102,7 @@ class CNN(object):
         C_all, quality = match(PD)
         tau_min = np.min(quality)
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 16: tau_max -= 0.001
+        while np.where(quality >= tau_max)[0].shape[0] <= 33: tau_max -= 0.001
         tau = tau_max
         delta = (tau_max - tau_min) / 10.0
 
@@ -322,7 +324,7 @@ class CNN1(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -383,8 +385,10 @@ class CNN1(object):
         # prematch and select points
         PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
+        print('mean quality: %f' % np.mean(quality))
 
         tau_max = np.max(quality)
+        print('tau_max: %f' % tau_max)
         while np.where(quality >= tau_max)[0].shape[0] <= 48: tau_max -= 0.001
 
         C = C_all[np.where(quality >= tau_max)]
@@ -482,7 +486,7 @@ class CNN2(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -543,9 +547,11 @@ class CNN2(object):
         # prematch and select points
         PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
+        print('mean quality: %f' % np.mean(quality))
 
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 48: tau_max -= 0.001
+        print(tau_max)
+        while np.where(quality >= tau_max)[0].shape[0] <= 261: tau_max -= 0.001
 
         C = C_all[np.where(quality >= tau_max)]
         X, Y = X[C[:, 1]], Y[C[:, 0]]
@@ -562,7 +568,7 @@ class CNN2(object):
         C_all, quality = match(PD)
         tau_min = np.min(quality)
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 16: tau_max -= 0.001
+        while np.where(quality >= tau_max)[0].shape[0] <= 130: tau_max -= 0.001
         tau = tau_max
         delta = (tau_max - tau_min) / 10.0
 
@@ -627,7 +633,7 @@ class CNN2(object):
             dQ = Q - Q_old
             itr = itr + 1
 
-            # print(itr, Q, tau)
+            #print(itr, Q, tau)
 
         print('finish: itr %d, Q %d, tau %d' % (itr, Q, tau))
         return ((X*224.0)+112.0)*Xscale, ((Y*224.0)+112.0)*Yscale, ((T*224.0)+112.0)*Xscale
@@ -642,7 +648,7 @@ class CNN3(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -704,9 +710,11 @@ class CNN3(object):
         # prematch and select points
         PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
+        print('mean quality: %f' % np.mean(quality))
 
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 20: tau_max -= 0.001
+        print(tau_max)
+        while np.where(quality >= tau_max)[0].shape[0] <= 16: tau_max -= 0.001
 
         C = C_all[np.where(quality >= tau_max)]
         X, Y = X[C[:, 1]], Y[C[:, 0]]
@@ -803,7 +811,7 @@ class CNN4(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -957,7 +965,7 @@ class CNN5(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -1108,8 +1116,7 @@ class CNN5(object):
         print('finish: itr %d, Q %d, tau %d' % (itr, Q, tau))
         return ((X*224.0)+112.0)*Xscale, ((Y*224.0)+112.0)*Yscale, ((T*224.0)+112.0)*Xscale
 
-
-class CNN6(object):
+class CNN7(object):
     def __init__(self):
         self.height = 224
         self.width = 224
@@ -1118,7 +1125,7 @@ class CNN6(object):
         self.sift_weight = 2.0
         self.cnn_weight = 1.0
 
-        self.max_itr = 500
+        self.max_itr = 200
 
         self.tolerance = 1e-2
         self.freq = 5
@@ -1126,6 +1133,7 @@ class CNN6(object):
         self.omega = 0.5
         self.beta = 2.0
         self.lambd = 0.5
+        self.init_thres = 1.15
 
         self.cnnph = tf.placeholder("float", [2, 224, 224, 3])
         self.vgg = VGG16mo()
@@ -1159,29 +1167,20 @@ class CNN6(object):
                 self.vgg.pool3, self.vgg.pool4, self.vgg.pool5_1
             ], feed_dict=feed_dict)
 
-        D2 = np.kron(D2, np.ones([2, 2, 1]))
-        D3 = np.kron(D3, np.ones([4, 4, 1]))
+        DX1, DY1 = np.reshape(D1[0], [-1, 256]), np.reshape(D1[1], [-1, 256])
+        DX2, DY2 = np.reshape(D2[0], [-1, 512]), np.reshape(D2[1], [-1, 512])
+        DX3, DY3 = np.reshape(D3[0], [-1, 512]), np.reshape(D3[1], [-1, 512])
 
-        # generate combined feature
+        del D1, D2, D3
+
+        PD1 = pairwise_distance(DX1, DY1)
+        PD2 = pd_expand(pairwise_distance(DX2, DY2), 2)
+        PD3 = pd_expand(pairwise_distance(DX3, DY3), 4)
+        PD = PD1 + PD2 + PD3
+
+        del DX1, DY1, DX2, DY2, DX3, DY3, PD1, PD2, PD3
 
         seq = np.array([[i, j] for i in range(28) for j in range(28)], dtype='int32')
-
-        DX1 = D1[0, seq[:, 0], seq[:, 1]]
-        DY1 = D1[1, seq[:, 0], seq[:, 1]]
-        DX2 = D2[0, seq[:, 0], seq[:, 1]]
-        DY2 = D2[1, seq[:, 0], seq[:, 1]]
-        DX3 = D3[0, seq[:, 0], seq[:, 1]]
-        DY3 = D3[1, seq[:, 0], seq[:, 1]]
-
-        DX1 = DX1 / np.std(DX1)
-        DY1 = DY1 / np.std(DY1)
-        DX2 = DX2 / np.std(DX2)
-        DY2 = DY2 / np.std(DY2)
-        DX3 = DX3 / np.std(DX3)
-        DY3 = DY3 / np.std(DY3)
-
-        DX = np.concatenate([DX1, DX2, DX3], axis=1)
-        DY = np.concatenate([DY1, DY2, DY3], axis=1)
 
         X = np.array(seq, dtype='float32') * 8.0 + 4.0
         Y = np.array(seq, dtype='float32') * 8.0 + 4.0
@@ -1192,27 +1191,29 @@ class CNN6(object):
         Y = (Y - 112.0) / 224.0
 
         # prematch and select points
-        PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
 
-        tau_max = np.max(quality)
-        print(tau_max)
-        while np.where(quality >= tau_max)[0].shape[0] <= 128: tau_max -= 0.01
+        # tau_max = np.max(quality)
+        # print(tau_max)
+        # while np.where(quality >= tau_max)[0].shape[0] <= 128: tau_max -= 0.01
 
-        C = C_all[np.where(quality >= tau_max)]
+        C = C_all[np.where(quality >= self.init_thres)]
+        cnt = C.shape[0]
+        print(cnt)
         X, Y = X[C[:, 1]], Y[C[:, 0]]
-        DX, DY = DX[C[:, 1]], DY[C[:, 0]]
+        PD = PD[np.repeat(np.reshape(C[:, 1], [cnt, 1]), cnt, axis=1),
+                np.repeat(np.reshape(C[:, 0], [1, cnt]), cnt, axis=0)]
+
 
         N = X.shape[0]
         M = X.shape[0]
         assert M == N
 
         # feature match precalc
-        PD = pairwise_distance(DX, DY)
         C_all, quality = match(PD)
         tau_min = np.min(quality)
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 64: tau_max -= 0.01
+        while np.where(quality >= tau_max)[0].shape[0] <= 0.5 * cnt: tau_max -= 0.01
         tau = tau_max
         delta = (tau_max - tau_min) / 10.0
 
@@ -1295,11 +1296,9 @@ def get_reg_by_name(name):
         return CNN3()
     if name == 'pool5':
         return CNN5()
-    if name == 'pool4_no_SC':
-        return CNN4()
     if name == 'cnn_combined':
-        return CNN6()
+        return CNN7()
     if name == 'sift':
         return SIFT()
 
-names = ['pool3', 'pool4', 'conv5_1', 'pool5_1', 'cnn_combined', 'sift']
+names = ['pool3', 'pool4', 'pool5_1', 'cnn_combined', 'sift']
