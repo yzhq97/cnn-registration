@@ -2,7 +2,7 @@ from __future__ import print_function
 import time
 import numpy as np
 import tensorflow as tf
-import REG
+import Register
 import matplotlib.pyplot as plt
 from utils.utils import *
 import cv2
@@ -19,9 +19,9 @@ shape_arr = np.array(IX.shape[:2])
 center = shape_arr / 2.0
 
 for i in range(1):
-    name = REG.names[3+i]
+    name = Register.names[3 + i]
     print(name)
-    reg = REG.get_reg_by_name(name)
+    reg = Register.get_reg_by_name(name)
     reg.init_thres = 1.25
 
     start_time = time.time()

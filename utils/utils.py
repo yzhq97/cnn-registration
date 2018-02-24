@@ -73,31 +73,14 @@ def compute(X, Y, T_old, Pm, sigma2, omega):
     Q = Np * log(sigma2) + tmp/(2.0*sigma2)
     return Po, P1, Np, tmp, Q
 
-def convert_feature(X, XS0, DXS0):
-    DXS = np.ones([14 * 14, 128]) * np.mean(DXS0)
-    Xmap = [[] for _ in range(14 * 14)]
-    for i in range(len(XS0)):
-        Xmap[int(XS0[i, 0] / 32.0) * 14 + int(XS0[i, 1] / 32.0)].append(i)
-
-    # # method 1
-    # for i in range(14 * 14):
-    #     mindis = float('Inf')
-    #     minind = -1
-    #     for j in range(len(Xmap[i])):
-    #         dis = np.linalg.norm(XS0[Xmap[i][j], :] - X[i, :])
-    #         if dis < mindis:
-    #             mindis = dis
-    #             minind = j
-    #     if minind != -1:
-    #         X[i, :] = XS0[Xmap[i][j], :]
-    #         DXS[i, :] = DXS0[Xmap[i][j], :]
-
-    # method 2
-    for i in range(14 * 14):
-        if len(Xmap[i]) > 0:
-            DXS[i, :] = np.mean(DXS0[Xmap[i], :], axis=0)
-
-    return X, DXS
+def pd_expand(PD, k):
+    N0 = np.int(np.sqrt(PD.shape[0]))
+    N1 = k*N0
+    L0, L1 = N0**2, N1**2
+    Cmat = np.kron(np.arange(L0).reshape([N0, N0]), np.ones([k, k], dtype='int32'))
+    i = np.repeat(Cmat.reshape([L1, 1]), L1, axis=1)
+    j = np.repeat(Cmat.reshape([1, L1]), L1, axis=0)
+    return PD[i, j]
 
 def tps_warp(Y, T, Y_image, out_shape):
     Y_height, Y_width = Y_image.shape[:2]
@@ -141,15 +124,6 @@ def checkboard(I1, I2, n=7):
                 out_image[h:h1, w:w1, :] = I2[h:h1, w:w1, :]
 
     return out_image
-
-def pd_expand(PD, k):
-    N0 = np.int(np.sqrt(PD.shape[0]))
-    N1 = k*N0
-    L0, L1 = N0**2, N1**2
-    Cmat = np.kron(np.arange(L0).reshape([N0, N0]), np.ones([k, k], dtype='int32'))
-    i = np.repeat(Cmat.reshape([L1, 1]), L1, axis=1)
-    j = np.repeat(Cmat.reshape([1, L1]), L1, axis=0)
-    return PD[i, j]
 
 
 

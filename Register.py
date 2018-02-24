@@ -4,7 +4,7 @@ import gc
 
 import numpy as np
 import tensorflow as tf
-from VGG16mo import VGG16mo
+from VGG16 import VGG16mo
 from utils.utils import *
 import cv2
 from lap import lapjv

@@ -3,7 +3,7 @@ import time
 import numpy as np
 import tensorflow as tf
 import cv2
-import REG
+import Register
 import matplotlib.pyplot as plt
 from utils.utils import *
 
@@ -18,7 +18,7 @@ IY = cv2.imread(IY_path)
 shape_arr = np.array(IX.shape[:2])
 center = shape_arr / 2.0
 
-reg = REG.CNN6()
+reg = Register.CNN6()
 xtime = time.time()
 X, Y, T = reg.register(IX, IY)
 print(time.time()-xtime)
