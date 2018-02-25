@@ -551,7 +551,7 @@ class CNN2(object):
 
         tau_max = np.max(quality)
         print(tau_max)
-        while np.where(quality >= tau_max)[0].shape[0] <= 261: tau_max -= 0.001
+        while np.where(quality >= tau_max)[0].shape[0] <= 128: tau_max -= 0.001
 
         C = C_all[np.where(quality >= tau_max)]
         X, Y = X[C[:, 1]], Y[C[:, 0]]
@@ -568,7 +568,7 @@ class CNN2(object):
         C_all, quality = match(PD)
         tau_min = np.min(quality)
         tau_max = np.max(quality)
-        while np.where(quality >= tau_max)[0].shape[0] <= 130: tau_max -= 0.001
+        while np.where(quality >= tau_max)[0].shape[0] <= 64: tau_max -= 0.001
         tau = tau_max
         delta = (tau_max - tau_min) / 10.0
 
@@ -1170,6 +1170,10 @@ class CNN7(object):
         DX1, DY1 = np.reshape(D1[0], [-1, 256]), np.reshape(D1[1], [-1, 256])
         DX2, DY2 = np.reshape(D2[0], [-1, 512]), np.reshape(D2[1], [-1, 512])
         DX3, DY3 = np.reshape(D3[0], [-1, 512]), np.reshape(D3[1], [-1, 512])
+
+        DX1, DY1 = DX1 / np.std(DX1), DY1 / np.std(DY1)
+        DX2, DY2 = DX2 / np.std(DX2), DY2 / np.std(DY2)
+        DX3, DY3 = DX3 / np.std(DX3), DY3 / np.std(DY3)
 
         del D1, D2, D3
 
