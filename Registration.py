@@ -223,7 +223,7 @@ class SIFT(object):
         # select points
         PD = pairwise_distance(DXS, DYS)
         C_all, quality = match(PD)
-        C = C_all[np.where(quality >= 1.25)]
+        C = C_all[np.where(quality >= 1.15)]
         X, Y = XS[C[:, 1], :], YS[C[:, 0], :]
         DX, DY = DXS[C[:, 1], :], DYS[C[:, 0], :]
 
@@ -1180,7 +1180,7 @@ class CNN7(object):
         PD1 = pairwise_distance(DX1, DY1)
         PD2 = pd_expand(pairwise_distance(DX2, DY2), 2)
         PD3 = pd_expand(pairwise_distance(DX3, DY3), 4)
-        PD = PD1 + PD2 + PD3
+        PD = 1.5 * PD1 + PD2 + PD3
 
         del DX1, DY1, DX2, DY2, DX3, DY3, PD1, PD2, PD3
 
@@ -1288,6 +1288,73 @@ class CNN7(object):
         print('finish: itr %d, Q %d, tau %d' % (itr, Q, tau))
         return ((X*224.0)+112.0)*Xscale, ((Y*224.0)+112.0)*Yscale, ((T*224.0)+112.0)*Xscale
 
+class CNN_feature(object):
+    def __init__(self):
+        self.height = 224
+        self.width = 224
+        self.shape = np.array([224.0, 224.0])
+
+        self.cnnph = tf.placeholder("float", [2, 224, 224, 3])
+        self.vgg = VGG16mo()
+        self.vgg.build(self.cnnph)
+
+    def extract(self, IX, IY):
+
+        # resize image
+        Xscale = 1.0 * np.array(IX.shape[:2]) / self.shape
+        Yscale = 1.0 * np.array(IY.shape[:2]) / self.shape
+        IX = cv2.resize(IX, (self.height, self.width))
+        IY = cv2.resize(IY, (self.height, self.width))
+
+        # CNN feature
+
+        IX = np.expand_dims(IX, axis=0)
+        IY = np.expand_dims(IY, axis=0)
+        cnn_input = np.concatenate((IX, IY), axis=0)
+        with tf.Session() as sess:
+            feed_dict = {self.cnnph: cnn_input}
+            D1, D2, D3 = sess.run([
+                self.vgg.pool3, self.vgg.pool4, self.vgg.pool5_1
+            ], feed_dict=feed_dict)
+
+        DX1, DY1 = np.reshape(D1[0], [-1, 256]), np.reshape(D1[1], [-1, 256])
+        DX2, DY2 = np.reshape(D2[0], [-1, 512]), np.reshape(D2[1], [-1, 512])
+        DX3, DY3 = np.reshape(D3[0], [-1, 512]), np.reshape(D3[1], [-1, 512])
+
+        DX1, DY1 = DX1 / np.std(DX1), DY1 / np.std(DY1)
+        DX2, DY2 = DX2 / np.std(DX2), DY2 / np.std(DY2)
+        DX3, DY3 = DX3 / np.std(DX3), DY3 / np.std(DY3)
+
+        del D1, D2, D3
+
+        PD1 = pairwise_distance(DX1, DY1)
+        PD2 = pd_expand(pairwise_distance(DX2, DY2), 2)
+        PD3 = pd_expand(pairwise_distance(DX3, DY3), 4)
+        PD = 1.414 * PD1 + PD2 + PD3
+
+        del DX1, DY1, DX2, DY2, DX3, DY3, PD1, PD2, PD3
+
+        seq = np.array([[i, j] for i in range(28) for j in range(28)], dtype='int32')
+
+        X = np.array(seq, dtype='float32') * 8.0 + 4.0
+        Y = np.array(seq, dtype='float32') * 8.0 + 4.0
+
+        # normalize
+
+        X = (X - 112.0) / 224.0
+        Y = (Y - 112.0) / 224.0
+
+        # prematch and select points
+        C_all, quality = match(PD)
+        tau_max = np.max(quality)
+        print(tau_max)
+        while np.where(quality >= tau_max)[0].shape[0] <= 100: tau_max -= 0.001
+        C = C_all[np.where(quality >= tau_max)]
+
+        X = X[C[:, 1], :]
+        Y = Y[C[:, 0], :]
+
+        return ((X*224.0)+112.0)*Xscale, ((Y*224.0)+112.0)*Yscale
 
 def get_reg_by_name(name):
     if name == 'pool3':

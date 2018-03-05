@@ -49,6 +49,12 @@ def match(PD):
     min2 = np.amin(masked, axis=1)
     return C, np.array(min2/min1)
 
+def match_max(PD):
+    seq = np.arange(PD.shape[0])
+    amax1 = np.argmin(PD, axis=1)
+    C = np.array([seq, amax1]).transpose()
+    return C
+
 def compute(X, Y, T_old, Pm, sigma2, omega):
     N = X.shape[0]
     M = Y.shape[0]
