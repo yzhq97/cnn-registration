@@ -13,7 +13,7 @@ class VGG16mo:
         if vgg16_npy_path is None:
             path = inspect.getfile(VGG16mo)
             path = os.path.abspath(os.path.join(path, os.pardir))
-            path = os.path.join(path, "vgg16.npy")
+            path = os.path.join(path, "vgg16partial.npy")
             vgg16_npy_path = path
             #print(path)
 
@@ -76,18 +76,6 @@ class VGG16mo:
             bias = tf.nn.bias_add(conv, conv_biases)
 
             relu = tf.nn.relu(bias)
-            return relu
-
-    def kconv_layer(self, bottom, name):
-        with tf.variable_scope(name):
-            b, h, w, c = bottom.shape
-            s = int(h/14)
-            kern2d = gaussian_kernel(s)
-            filt = np.zeros([s, s, c, c])
-            for i in range(c): filt[:, :, i, i] = kern2d
-            filt = tf.constant(filt, name="filter", dtype='float32')
-            conv = tf.nn.conv2d(bottom, filt, [1, s, s, 1], padding='SAME')
-            relu = tf.nn.relu(conv)
             return relu
 
     def get_conv_filter(self, name):
