@@ -4,6 +4,9 @@ A image registration method using convolutional neural network features written 
 
 ![process](https://github.com/yzhq97/cnn-registration/raw/publish/img/process_comp.jpg)
 
+
+The paper "Multi-temporal Remote Sensing Image Registration Using Deep Convolutional Features" is submitted to IEEE Access and currently under review
+
 # Requirements
 To install all the requirements run
 ```
