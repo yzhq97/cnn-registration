@@ -1,6 +1,9 @@
 # cnn-registration
 A image registration method using convolutional neural network features written in Python2, Tensorflow API r1.5.0.
 
+![process](https://github.com/yzhq97/cnn-registration/raw/publish/img/process_comp.jpg)
+
+# Introduction
 Registration of multi-temporal remote sensing images has been widely applied in military and
 civilian fields, such as ground target identification, urban development assessment and geographic change
 assessment. Ground surface change challenges feature point detection in amount and quality, which is
@@ -12,9 +15,6 @@ robust multi-scale feature descriptors; (ii) we design a gradually increasing se
 robustness of feature points registration. Extensive experiments on feature matching and image registration
 are performed over a multi-temporal satellite image dataset and a multi-temporal unmanned aerial vehicle
 (UAV) image dataset. Our method outperforms four state-of-the-art methods in most scenarios.
-
-
-![process](https://github.com/yzhq97/cnn-registration/raw/publish/img/process_comp.jpg)
 
 
 The paper "Multi-temporal Remote Sensing Image Registration Using Deep Convolutional Features" is submitted to IEEE Access and currently under review.
