@@ -95,7 +95,7 @@ class CNN(object):
         tau_max = np.max(quality)
         while np.where(quality >= tau_max)[0].shape[0] <= 128: tau_max -= 0.01
 
-        C = C_all[np.where(quality >= self.init_thres)]
+        C = C_all[np.where(quality >= tau_max)]
         cnt = C.shape[0]
 
         # select prematched feature points

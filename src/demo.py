@@ -5,8 +5,8 @@ from utils.utils import *
 import cv2
 
 # designate image path here
-IX_path = 'IX.jpg'
-IY_path = 'IY.jpg'
+IX_path = '../img/1a.jpg'
+IY_path = '../img/1b.jpg'
 
 IX = cv2.imread(IX_path)
 IY = cv2.imread(IY_path)

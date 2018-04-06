@@ -1,5 +1,6 @@
 # cnn-registration
 A image registration method using convolutional neural network features written in Python2, Tensorflow API r1.5.0.
+![Alt text](https://github.com/yzhq97/cnn-registration/raw/publish/img/process_comp.jpg)
 
 # Requirements
 To install all the requirements run
