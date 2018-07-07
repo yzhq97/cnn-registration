@@ -26,7 +26,7 @@ The paper "Multi-temporal Remote Sensing Image Registration Using Deep Convoluti
 * scipy
 * opencv-python
 * matplotlib
-* tensorflow
+* tensorflow (with or without gpu)
 * lap
 
 To install all the requirements run
