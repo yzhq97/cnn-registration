@@ -17,7 +17,7 @@ are performed over a multi-temporal satellite image dataset and a multi-temporal
 (UAV) image dataset. Our method outperforms four state-of-the-art methods in most scenarios.
 
 
-The paper "Multi-temporal Remote Sensing Image Registration Using Deep Convolutional Features" is submitted to IEEE Access and currently under review.
+The paper "Multi-temporal Remote Sensing Image Registration Using Deep Convolutional Features" has been accepted by IEEE Access and is awaiting publication.
 
 
 # Requirements
