@@ -34,6 +34,9 @@ To install all the requirements run
 pip install -r requirements.txt
 ```
 
+This code also needs pretrained VGG16 parameters file `vgg16partial.npy`, please download it from `https://drive.google.com/file/d/1o1xjU9F58x83iR91LoFjLOlBdLN3bPnm/view?usp=sharing`
+and put it under the `src/` directory.
+
 # Usage
 see src/demo.py
 ```python
