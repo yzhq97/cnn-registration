@@ -29,7 +29,8 @@ citation information:
     volume={6}, 
     pages={38544-38555}, 
     doi={10.1109/ACCESS.2018.2853100}, 
-    ISSN={2169-3536}, 
+    ISSN={2169-3536}
+}
 ```
 
 # Requirements
