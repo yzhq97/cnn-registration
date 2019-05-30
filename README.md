@@ -46,6 +46,14 @@ To install all the requirements run
 ```
 pip install -r requirements.txt
 ```
+Prior to doing so, in some Linux distributions, you may need to install software packages such as the following:
+
+* pip
+* python2 development package
+* python-setup
+
+and you may need to do "pip install wheel".
+
 Pretrained VGG16 parameters file `vgg16partial.npy` is available at `https://drive.google.com/file/d/1o1xjU9F58x83iR91LoFjLOlBdLN3bPnm/view?usp=sharing`.
 Please download and put it under the `src/` directory.
 
