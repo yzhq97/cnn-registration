@@ -1,9 +1,16 @@
 from numpy import *
 import math
-from utils import pairwise_distance
+try:
+    from utils import pairwise_distance
+except ImportError:
+    from utils.utils import pairwise_distance
 
 seterr(all='ignore')
 
+try:
+    xrange           # Python 2
+except NameError:
+    xrange = range   # Python 3, xrange is now named range
 
 def logspace(d1, d2, n):
     sp = zeros(n)
@@ -61,6 +68,7 @@ class ShapeContext(object):
 
         r_array_q = zeros((N, N), dtype=int)
         for m in xrange(self.nbins_r):
+            
             r_array_q += (r_array_n < r_bin_edges[m])
 
         fz = r_array_q > 0
