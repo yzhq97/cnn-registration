@@ -45,6 +45,8 @@ class CNN(object):
         lambd = self.lambd
 
         # resize image
+
+
         Xscale = 1.0 * np.array(IX.shape[:2]) / self.shape
         Yscale = 1.0 * np.array(IY.shape[:2]) / self.shape
         IX = cv2.resize(IX, (self.height, self.width))

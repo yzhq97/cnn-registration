@@ -1,7 +1,7 @@
 from numpy import *
 import math
-from utils import pairwise_distance
-
+#from utils import pairwise_distance
+from utils.utils import pairwise_distance
 seterr(all='ignore')
 
 
@@ -29,16 +29,16 @@ class ShapeContext(object):
 
     def _dist2(self, x, c):
         result = zeros((N, len(c)))
-        for i in xrange(N):
-            for j in xrange(len(c)):
+        for i in range(N):
+            for j in range(len(c)):
                 result[i, j] = euclid_distance(x[i], c[j])
         return result
 
     def _get_angles(self, x):
         N = len(x)
         result = zeros((N, N))
-        for i in xrange(N):
-            for j in xrange(N):
+        for i in range(N):
+            for j in range(N):
                 result[i, j] = get_angle(x[i], x[j])
         return result
 
@@ -60,7 +60,7 @@ class ShapeContext(object):
         r_bin_edges = logspace(log10(self.r_inner), log10(self.r_outer), self.nbins_r)
 
         r_array_q = zeros((N, N), dtype=int)
-        for m in xrange(self.nbins_r):
+        for m in range(self.nbins_r):
             r_array_q += (r_array_n < r_bin_edges[m])
 
         fz = r_array_q > 0
@@ -77,9 +77,9 @@ class ShapeContext(object):
         ################################################################################
 
         BH = zeros((N, self.nbins))
-        for i in xrange(N):
+        for i in range(N):
             sn = zeros((self.nbins_r, self.nbins_theta))
-            for j in xrange(N):
+            for j in range(N):
                 if (fz[i, j]):
                     sn[r_array_q[i, j] - 1, theta_array_q[i, j] - 1] += 1
             BH[i] = sn.reshape(self.nbins)
@@ -88,7 +88,7 @@ class ShapeContext(object):
 
     def _cost(self, hi, hj):
         cost = 0
-        for k in xrange(self.nbins):
+        for k in range(self.nbins):
             if (hi[k] + hj[k]):
                 cost += ((hi[k] - hj[k]) ** 2) / (hi[k] + hj[k])
 
@@ -101,8 +101,8 @@ class ShapeContext(object):
         if qlength:
             d = qlength
         C = zeros((p, p2))
-        for i in xrange(p):
-            for j in xrange(p2):
+        for i in range(p):
+            for j in range(p2):
                 C[i, j] = self._cost(Q[j] / d, P[i] / p)
 
         return C

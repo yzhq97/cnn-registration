@@ -16,8 +16,8 @@ class VGG16mo:
             path = os.path.join(path, "vgg16partial.npy")
             vgg16_npy_path = path
             #print(path)
-
-        self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
+        print(vgg16_npy_path)
+        self.data_dict = np.load(vgg16_npy_path, encoding='latin1', allow_pickle=True).item()
         #print("npy file loaded")
 
     def build(self, bgr):
